@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Tests", "WebApp.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1E671A46-3020-4306-88A2-CF7A2D34AF93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.BadDockerfile", "..\WebApp.BadDockerfile\WebApp.BadDockerfile.csproj", "{05032A28-F96B-473B-A3DE-0D194A81714C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.BadDockerfile", "WebApp.BadDockerfile\WebApp.BadDockerfile.csproj", "{05032A28-F96B-473B-A3DE-0D194A81714C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
