@@ -1,0 +1,51 @@
+
+az account list
+
+# $ SUB_ID=[YOUR_SUB_ID]
+az account set --subscription $SUB_ID
+
+az group create --name kube-demo --location eastus
+
+az configure --defaults group=kube-demo location=eastus
+
+az acs create --orchestrator-type=kubernetes --name=kube-demo-cluster --dns-prefix=kube-demo --generate-ssh-key
+
+# Install kubectl (if you dont already have it)
+# sudo az acs kubernetes install-cli
+
+# get cluster credentials and set kubectl context
+az acs kubernetes get-credentials --name=kube-demo-cluster
+
+# verify in the right kubernetes context
+kubectl config current-context
+
+# Get kubernetes nodes
+kubectl get nodes
+
+# Create your first Kubernetes service
+kubectl run nginx --image nginx
+
+# Expose the service to the world
+kubectl expose deployments nginx --port=80 --type=LoadBalancer
+
+kubectl get svc --watch
+
+# proxy to dashboard
+kubectl proxy
+
+# Remote sessions inside your containers
+
+# Get the name of your nginx pods
+kubectl get pods
+
+# Using your pod name, you can run a remote command on your pod. For example:
+kubectl exec <pod name> date
+
+# fully interactive session
+kubectl exec <pod name> -it bash
+
+# Delete deployment
+kubectl delete deployment nginx
+kubectl delete service nginx
+
+# Deploy our app
