@@ -1,43 +1,65 @@
 
+# Login
+az login
+
+# List accounts
 az account list
 
 # $ SUB_ID=[YOUR_SUB_ID]
 az account set --subscription $SUB_ID
 
+# Create new resource group
 az group create --name kube-demo --location eastus
 
+# Set defaults
 az configure --defaults group=kube-demo location=eastus
 
+# Clear defaults
+az configure --defaults group='' location=''
+
+# Create Kubernetes cluster using Azure Container Service
 az acs create --orchestrator-type=kubernetes --name=kube-demo-cluster --dns-prefix=kube-demo --generate-ssh-key
 
+# See VMs
+az vm list --output table --show-details
+
 # Install kubectl (if you dont already have it)
-# sudo az acs kubernetes install-cli
+sudo az acs kubernetes install-cli
 
 # get cluster credentials and set kubectl context
 az acs kubernetes get-credentials --name=kube-demo-cluster
 
-# verify in the right kubernetes context
+# verify we are in the right kubernetes context
 kubectl config current-context
 
 # Get kubernetes nodes
 kubectl get nodes
 
 # Create your first Kubernetes service
-kubectl run nginx --image nginx
+kubectl run hello --image billpratt/netcore-hello-world
+
+# Get deployment details
+kubectl get deployment hello
 
 # Expose the service to the world
-kubectl expose deployments nginx --port=80 --type=LoadBalancer
+kubectl expose deployments hello --port=80 --type=LoadBalancer
 
+# Watch for service changes
 kubectl get svc --watch
+
+# Get pods
+kubectl get pods -o wide
+
+# Scale up
+kubectl scale deployments/hello --replicas=3
+
+# Describe deployment
+kubectl describe deployments/hello
 
 # proxy to dashboard
 kubectl proxy
 
 # Remote sessions inside your containers
-
-# Get the name of your nginx pods
-kubectl get pods
-
 # Using your pod name, you can run a remote command on your pod. For example:
 kubectl exec <pod name> date
 
@@ -45,7 +67,52 @@ kubectl exec <pod name> date
 kubectl exec <pod name> -it bash
 
 # Delete deployment
-kubectl delete deployment nginx
-kubectl delete service nginx
+kubectl delete deployment hello
+kubectl delete service hello
 
-# Deploy our app
+# Deploy our app!
+
+# Create Docker image registry on Azure Container Registry
+az acr create --name kubedemo --sku Basic --resource-group kube-demo --location eastus
+
+# Enable admin credentials
+az acr update -n kubedemo --admin-enabled true
+
+# Disable admin credentials
+az acr update -n kubedemo --admin-enabled false
+
+# Obtain admin user credentials
+az acr credential show -n kubedemo
+
+# Log in to our ACR
+docker login kubedemo.azurecr.io -u <username> -p <password>
+
+# Build image with registry path
+docker build -f Dockerfile.MultiStage -t kubedemo.azurecr.io/webapp:1.0 .
+
+# Push to ACR
+docker push kubedemo.azurecr.io/webapp:1.0
+
+# List repositories in ACR
+az acr repository list -n kubedemo -o json
+
+# List tags
+az acr repository show-tags -n kubedemo --repository webapp -o json
+
+# Create your first Kubernetes service
+kubectl run webapp --image kubedemo.azurecr.io/webapp:1.0
+
+# Get deployment details
+kubectl get deployment webapp
+
+# Expose the service to the world
+kubectl expose deployments webapp --port=80 --type=LoadBalancer
+
+# Watch for service changes
+kubectl get svc --watch
+
+# Make an update and build, tag and deploy v 1.1
+
+# Update deployment using rolling update
+kubectl rolling-update webapp --image=kubedemo.azurecr.io/webapp:1.1
+
