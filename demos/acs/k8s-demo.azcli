@@ -90,6 +90,9 @@ docker login kubedemo.azurecr.io -u <username> -p <password>
 # Build image with registry path
 docker build -f Dockerfile.MultiStage -t kubedemo.azurecr.io/webapp:1.0 .
 
+# See images
+docker image ls
+
 # Push to ACR
 docker push kubedemo.azurecr.io/webapp:1.0
 
